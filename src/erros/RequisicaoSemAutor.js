@@ -1,8 +1,8 @@
 import RequisicaoIncorreta from "./RequisicaoIncorreta.js";
 
 class RequisicaoSemAutor extends RequisicaoIncorreta {
-  constructor() {
-    super("O autor(a) é obrigatório");
+  constructor(mensagem = "O autor(a) é obrigatório") {
+    super(mensagem);
   } 
 }
 
