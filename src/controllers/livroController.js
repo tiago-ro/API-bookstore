@@ -1,6 +1,5 @@
 import livro from "../models/Livro.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
-import { autor } from "../models/Autor.js";
 
 class LivroController {
 
@@ -14,19 +13,10 @@ class LivroController {
   }
 
   static cadastrarLivro = async (req, res, next) => {
-    // const novoLivro = req.body;
     try {
-
       const novoLivros = new livro(req.body);
       const livroCriado = await novoLivros.save();
-      console.log(livroCriado);
-
-      res.status(201).json({message: "criado com sucesso", livro: livroCriado});
-
-      // const autorEncontrado = await autor.findById(novoLivro.autor);
-      // const livroCompleto = { ...novoLivro, autor: { ...autorEncontrado._doc } };
-      // const livroCriado = await livro.create(livroCompleto);
-      // res.status(201).json({ message: "criado com sucesso", livro: livroCriado });
+      res.status(201).json({ message: "criado com sucesso", livro: livroCriado });
     }
     catch (erro) {
       next(erro);
@@ -68,7 +58,7 @@ class LivroController {
       if (livroEncontrado !== null) {
         res.status(400).json({ message: "Livro excluido com sucesso" });
       } else {
-        next (new NaoEncontrado("Id do livro não localizado."));
+        next(new NaoEncontrado("Id do livro não localizado."));
       }
     } catch (erro) {
       next(erro);
