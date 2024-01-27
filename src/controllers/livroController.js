@@ -1,5 +1,6 @@
-import livro from "../models/Livro.js";
+import { livro } from "../models/index.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
+
 
 class LivroController {
 
@@ -18,8 +19,10 @@ class LivroController {
       const livroCriado = await novoLivros.save();
       res.status(201).json({ message: "criado com sucesso", livro: livroCriado });
     }
-    catch (erro) {
+    catch (erro) {  
+      
       next(erro);
+
     }
   };
 
@@ -65,11 +68,18 @@ class LivroController {
     }
   }
 
-  static async listarLivrosPorEditora(req, res, next) {
-    const editora = req.query.editora;
+  static async listarLivrosPorFiltro(req, res, next) {
     try {
-      const livrosPorEditora = await livro.find({ editora: editora });
-      res.status(200).json(livrosPorEditora);
+      const {editora, titulo} = req.query;
+      
+      const busca = {};
+
+      if (editora) busca.editora = editora;
+      if (titulo) busca.titulo = {$regex: titulo, $options: "i"};
+
+      const livrosResultado = await livro.find(busca);
+  
+      res.status(200).json(livrosResultado);
     } catch (erro) {
       next(erro);
     }
