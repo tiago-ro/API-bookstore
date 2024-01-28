@@ -24,7 +24,7 @@ const livroSchema = new mongoose.Schema({
   // autor: autorSchema 
   autor: {
     type: String,
-    ref: "autor",
+    ref: "autores",
     required: [true, "O(a) autor(a) é obrigatório"]
   },
   

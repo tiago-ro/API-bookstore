@@ -1,4 +1,4 @@
-import { livro } from "../models/index.js";
+import { autor, livro } from "../models/index.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
 
 
@@ -72,7 +72,10 @@ class LivroController {
     try {
       const busca = await processaBusca(req.query);
       
-      const livrosResultado = await livro.find(busca);
+      const livrosResultado = await livro
+        .find(busca)
+        .populate("autor");
+  
 
       res.status(200).json(livrosResultado);
     } catch (erro) {
@@ -82,8 +85,9 @@ class LivroController {
 }
 
 async function processaBusca(parametros) {
-  const {editora, titulo, minPaginas, maxPaginas} = parametros;
+  const {editora, titulo, minPaginas, maxPaginas, nomeAutor} = parametros;
       
+  
   const busca = {};
 
   if (editora) busca.editora = editora;
@@ -92,6 +96,13 @@ async function processaBusca(parametros) {
 
   if (minPaginas) busca.paginas.$gte = minPaginas;
   if (maxPaginas) busca.paginas.$lte = maxPaginas;
+
+  if (nomeAutor) 
+  {
+    const autorEncontrado = await autor.findOne({ nome: nomeAutor});
+    const autorId = autorEncontrado._id;
+    busca.autor = autorId;
+  }
 
   return busca;
 }
