@@ -1,13 +1,29 @@
-import { autor, livro } from "../models/index.js";
+import { autor,  livro } from "../models/index.js";
 import NaoEncontrado from "../erros/NaoEncontrado.js";
+import RequisicaoIncorreta from "../erros/RequisicaoIncorreta.js";
 
 
 class LivroController {
 
   static async listarLivros(req, res, next) {
     try {
-      const listaLivros = await livro.find({});
-      res.status(200).json(listaLivros);
+      let {limite = 5, pagina = 1} = req.query;
+      
+      limite = parseInt(limite);
+      pagina - parseInt(pagina);
+
+      if (limite > 0 && pagina > 0) {
+        const listaLivros = await livro.find()
+          .skip((pagina - 1) * limite)
+          .limit(limite)
+          .populate("autor")
+          .exec();
+
+        res.status(200).json(listaLivros);
+      } else {
+        next(new RequisicaoIncorreta());
+      }
+
     } catch (erro) {
       next(erro);
     }
@@ -71,13 +87,18 @@ class LivroController {
   static async listarLivrosPorFiltro(req, res, next) {
     try {
       const busca = await processaBusca(req.query);
-      
-      const livrosResultado = await livro
-        .find(busca)
-        .populate("autor");
-  
 
-      res.status(200).json(livrosResultado);
+      if (busca !== null) {
+        const livrosResultado = await livro
+          .find(busca)
+          .populate("autor");
+    
+  
+        res.status(200).json(livrosResultado);
+      } else {
+        res.status(200).send([]);
+      }
+      
     } catch (erro) {
       next(erro);
     }
@@ -88,7 +109,7 @@ async function processaBusca(parametros) {
   const {editora, titulo, minPaginas, maxPaginas, nomeAutor} = parametros;
       
   
-  const busca = {};
+  let busca = {};
 
   if (editora) busca.editora = editora;
   if (titulo) busca.titulo = {$regex: titulo, $options: "i"};
@@ -100,8 +121,11 @@ async function processaBusca(parametros) {
   if (nomeAutor) 
   {
     const autorEncontrado = await autor.findOne({ nome: nomeAutor});
-    const autorId = autorEncontrado._id;
-    busca.autor = autorId;
+    if ( autorEncontrado !== null) {
+      busca.autor = autorEncontrado._id;
+    } else {
+      busca = null;
+    }
   }
 
   return busca;

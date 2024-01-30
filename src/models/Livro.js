@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-// import { autorSchema } from "./Autor.js";
 
 const livroSchema = new mongoose.Schema({
   id: { type: mongoose.Schema.Types.ObjectId },
@@ -21,7 +20,6 @@ const livroSchema = new mongoose.Schema({
     min: [10, "O número de páginas deve estar entre 10 e 5000. Valor fornecido {VALUE}"],
     max: [5000, "O número de páginas deve estar entre 10 e 5000. Valor fornecido {VALUE}"]
   },
-  // autor: autorSchema 
   autor: {
     type: String,
     ref: "autores",
