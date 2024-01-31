@@ -5,8 +5,12 @@ class AutorController {
   
   static async listarAutores (req, res, next) {
     try {
-      const listarAutores = await autor.find({});
-      res.status(200).json(listarAutores);
+      const listarAutores = autor.find({});
+
+      req.resultado = listarAutores;
+
+      next();
+
     } catch (erro) {
       next(erro);
     }
