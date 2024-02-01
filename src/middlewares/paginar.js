@@ -11,14 +11,16 @@ async function paginar(req, res, next) {
     ordem = parseInt(ordem);
 
     const resultado = req.resultado;
-
+    
     if (limite > 0 && pagina > 0) {
       const resultadoPaginado = await resultado.find()
         .sort({ [campoOrdenacao]: ordem })
+        .collation({locale: "fo", numericOrdering: true})
         .skip((pagina - 1) * limite)
         .limit(limite)
         .exec();
       res.status(200).json(resultadoPaginado);
+
     } else {
       next(new RequisicaoIncorreta());
     }
